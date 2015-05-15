@@ -8,6 +8,16 @@
  ============================================================================
  */
 
+/*
+ ============================================================================
+ Name        : Chat.c
+ Author      : 
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -49,7 +59,6 @@ int main(void) {
 	my_addr.sin_family = AF_INET; // ordenacion de byte de la maquina
 	my_addr.sin_port = htons(MYPORT);
 	my_addr.sin_addr.s_addr = INADDR_ANY;
-	printf("%d",INADDR_ANY);
 	memset(&(my_addr.sin_zero), '\0', 8);
 	if((bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr))) == -1)
 	{
@@ -61,23 +70,21 @@ int main(void) {
 		perror("listen");
 		exit(1);
 	}
+	sin_size = sizeof(struct sockaddr_in);
+			if((new_fd = accept(sockfd, (struct sockaddr *)&client_addr, &sin_size)) == -1 )
+			{
+				perror("accept");
+			}
+			printf("Conexion establecida\n");
 
 	while(1)
 	{
-		sin_size = sizeof(struct sockaddr_in);
-		if((new_fd = accept(sockfd, (struct sockaddr *)&client_addr, &sin_size)) == -1 )
-		{
-			perror("accept");
-			continue;
-		}
-		printf("Conexion establecida");
-		//printf("Servidor: Conexion establecida con %s/n", inet_ntoa(client_addr.sin_addr));
+			fflush(stdout);
+			__fpurge(stdin);
 
-		if(!fork()) //proceso hijo
-		{
 			//Mensaje servidor
 			printf("Servidor: ");
-			scanf("%*c%[^\n]", chat_dialogo);
+			scanf("%[^\n]s", chat_dialogo);
 			long_chat_dialogo = strlen(chat_dialogo);
 			do
 			{
@@ -86,24 +93,22 @@ int main(void) {
 			else
 				mjsEnviado = 0;
 			}while(mjsEnviado);
+
 			if((strcmp(chat_dialogo, "desconectar")) == 0 )
 				break;
+
 			//Mensaje Cliente
-			do
-			{
-			if((numBytes=recv(sockfd, bufer, MAXDATASIZE-1, 0)) == -1)
-				perror("recv");
-			else
-				msjRecibido = 0;
-			}while(msjRecibido);
+			if((numBytes=recv(new_fd, bufer, MAXDATASIZE-1, 0)) == -1)
+							perror("recv");
+
+
 			bufer[numBytes] = '\0';
 			if((strcmp(bufer, "desconectar")) == 0 )
 				break;
 			printf("Cliente: %s\n", bufer);
 			continue;
 		}
-		break;
-	}
+
 	close(sockfd);
 	close(new_fd);
 	return 0;
