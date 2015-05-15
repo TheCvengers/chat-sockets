@@ -37,17 +37,7 @@ int main(int argc, char *argv[]) {
 	struct sockaddr_in server_addr;
 	printf("IP servidor: ");
 	scanf("%s/n", ip_server);
-	/*if(argc !=2)
-	{
-		fprintf(stderr, "Usar direccion IP del servidor /n");
-		exit(1);
-	}
-	if((he = gethostbyname(argv[1])) == NULL)
-	{
-		perror("gethostbyname");
-		exit(1);
-	}
-	*/
+
 	if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1 )
 	{
 		perror("socket");
@@ -70,12 +60,14 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 	bufer[numBytes] = '\0';
-	printf("Servidor: %s/n", bufer);
+	printf("Servidor: %s \n", bufer);
 	while(1)
 	{
+		fflush(stdout);
+		__fpurge(stdin);
 		//Mensaje cliente
 		printf("Cliente: ");
-		scanf("%*c%[^\n]", chat_dialogo);
+		scanf("%[^\n]s ", chat_dialogo);
 		long_chat_dialogo = strlen(chat_dialogo);
 		do
 		{
@@ -97,7 +89,7 @@ int main(int argc, char *argv[]) {
 		bufer[numBytes] = '\0';
 		if((strcmp(bufer, "desconectar")) == 0 )
 			break;
-		printf("Servidor: %s/n", bufer);
+		printf("Servidor: %s\n", bufer);
 	}
 	close(sockfd);
 	return 0;
